@@ -1,0 +1,3 @@
+{"timestamp":"2026-07-26T08:00:00Z","username":"michael","success":false,"ip":"192.0.2.10","device":"macbook"}
+{"timestamp":"2026-07-26T08:01:00Z","username":"michael","success":false,"ip":"192.0.2.10","device":"macbook"}
+{"timestamp":"2026-07-26T08:03:00Z","username":"michael","success":true,"ip":"192.0.2.10","device":"macbook"}

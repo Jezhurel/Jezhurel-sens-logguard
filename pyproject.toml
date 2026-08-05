@@ -1,0 +1,9 @@
+[project]
+name = "sens-logguard"
+version = "0.1.0"
+description = "A deterministic security log analyzer."
+requires-python = ">=3.9"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
