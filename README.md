@@ -69,6 +69,7 @@ Example synthetic record:
 
 ```text
 sens-logguard/
+├── docs/json-type-boundary.md       # Guided parser trust-boundary lesson
 ├── sample_data/login_events.jsonl  # Synthetic example events
 ├── src/logguard/parser.py          # JSONL loading and structural validation
 ├── tests/test_parser.py            # Parser acceptance tests
@@ -164,6 +165,10 @@ Before adding the first detector, add a test named
 `test_json_array_is_rejected`. It should write `[]` as one JSONL line and prove
 that the parser raises `ValueError` containing `must contain a JSON object`.
 This matters because `[]` is valid JSON, but it is not a login-event object.
+
+Work through [the JSON type-boundary lesson](docs/json-type-boundary.md) before
+writing the test. It explains the three validation layers and gives you a
+prediction table to complete without revealing the exercise's final code.
 
 After that fourth parser test passes, the next milestone can implement a
 deterministic rule for three or more failed logins from the same username or IP
