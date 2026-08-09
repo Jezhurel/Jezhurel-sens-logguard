@@ -45,3 +45,14 @@ def test_missing_fields_are_rejected(tmp_path: Path) -> None:
         match="Missing required field.*line 1",
     ):
         load_login_events(log_file)
+
+
+def test_json_array_is_rejected(tmp_path: Path) -> None:
+    log_file = tmp_path / "array.jsonl"
+    log_file.write_text("[]\n", encoding="utf-8")
+
+    with pytest.raises(
+        ValueError,
+        match="must contain a JSON object",
+    ):
+        load_login_events(log_file)
