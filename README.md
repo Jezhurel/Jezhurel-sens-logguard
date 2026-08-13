@@ -71,6 +71,7 @@ Example synthetic record:
 sens-logguard/
 ├── docs/json-type-boundary.md       # Guided parser trust-boundary lesson
 ├── sample_data/login_events.jsonl  # Synthetic example events
+├── src/logguard/detector.py         # Review-only failed-login burst detector
 ├── src/logguard/parser.py          # JSONL loading and structural validation
 ├── tests/test_parser.py            # Parser acceptance tests
 ├── .gitignore                      # Excludes local/generated files
@@ -121,6 +122,44 @@ It raises `ValueError` for invalid JSON, a non-object JSON value, or missing
 required fields. Normal file errors such as a missing path remain `OSError`
 subclasses so the caller can distinguish file access from data validation.
 
+## Failed-login burst detector
+
+`detect_failed_login_bursts()` identifies three or more failed login events in
+an inclusive five-minute window. It groups failures independently by username
+and by source IP, then returns deterministic, review-only alerts.
+
+```python
+from logguard.detector import detect_failed_login_bursts
+from logguard.parser import load_login_events
+
+alerts = detect_failed_login_bursts(
+    load_login_events("sample_data/login_events.jsonl")
+)
+```
+
+Each alert has this shape:
+
+```json
+{
+  "category": "failed_login_burst",
+  "severity": "high",
+  "username": "michael",
+  "source_ip": "192.0.2.10",
+  "evidence_count": 3,
+  "requires_human_review": true
+}
+```
+
+When a username burst spans multiple IPs, `source_ip` is `null`. When an IP
+burst spans multiple usernames, `username` is `null`. This avoids claiming that
+one value represented all evidence. The detector requires timezone-aware ISO
+timestamps and boolean `success` values for failed events.
+
+An alert is not proof of an attack. Typing errors, shared networks, password
+manager issues, and legitimate account recovery can look similar. This project
+never sends a network request, blocks an account, or makes an enforcement
+decision.
+
 ## Acceptance tests
 
 The current suite proves that:
@@ -128,6 +167,8 @@ The current suite proves that:
 1. Three well-formed synthetic records load successfully.
 2. Invalid JSON reports its exact line number.
 3. A record missing required fields is rejected with its line number.
+4. A JSON array is rejected even though it is syntactically valid JSON.
+5. Failed-login bursts are detected deterministically and require human review.
 
 The suite does not yet prove field types, timestamp syntax, valid IP addresses,
 duplicate handling, large-file behavior, or security detection accuracy.
